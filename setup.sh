@@ -23,7 +23,7 @@ printf "# $NAME\n" > README.md
 
 echo
 echo 'Creating project directories'
-mkdir -vp project/{assets,scripts,scenes,lib,gdns} source include out
+mkdir -vp project/{assets,scripts,scenes,lib,gdns} source include out source/include
 
 echo
 echo 'Creating project'
@@ -68,7 +68,7 @@ export_presets.cfg
 .mono/
 .sconsign.dblite
 __pycache__
-bin/*
+out/*
 setup.sh
 EOF
 

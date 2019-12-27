@@ -88,13 +88,15 @@ bits = 64
 # Updates the environment with the option variables.
 opts.Update(env)
 
-# Check platform
-if env['platform'] == '':
-    print("No valid target platform selected.")
-    raise ValueError("No target platform selected.  Try: platform=<platform>")
+# Generates help for the -h scons option.
+Help(opts.GenerateHelpText(env))
 
 # Check our platform specifics
-if env['platform'] == "osx":
+if env['platform'] == '':
+    print(GetOption('clean'))
+    if (GetOption('help') == False) and (GetOption('clean') == False):
+        raise ValueError("No target platform selected.  Don't forget: platform=<platform>")
+elif env['platform'] == "osx":
     env.Append(LINKFLAGS = ['-arch', 'x86_64'])
     env.Append(CCFLAGS = ['-arch', 'x86_64'])
     if env['target'] in ('debug', 'd'):
@@ -249,6 +251,3 @@ library = env.SharedLibrary(
 )
 
 Default(library)
-
-# Generates help for the -h scons option.
-Help(opts.GenerateHelpText(env))
