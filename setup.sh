@@ -23,7 +23,7 @@ printf "# $NAME\n" > README.md
 
 echo
 echo 'Creating project directories'
-mkdir -vp project/{assets,scripts,scenes,lib,gdns} source include out source/include
+mkdir -vp project/{assets,scripts,scenes,lib,gdns} include out build source/include
 
 echo
 echo 'Creating project'
@@ -62,13 +62,57 @@ cat << EOF > .gitignore
 *.app
 *.x86_64
 *.apk
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.manifest
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
 .import/
 export.cfg
 export_presets.cfg
 .mono/
 .sconsign.dblite
 __pycache__
-out/*
+bin/*
+*-prefix/
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+build/
+out/
+.vscode/
+.vs/
+include/godot-cpp
 setup.sh
 EOF
 
@@ -80,41 +124,31 @@ background_mode = 2
 background_sky = SubResource( 1 )
 EOF
 
-cd project/
-curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png
-cd ../
-curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/SConstruct
+cat << EOF > source/version.hpp.in
+#ifndef __MYVERSION_HPP__
+#define __MYVERSION_HPP__
+
+#define _PROJECT_NAME "@PROJECT_NAME@"
+#define _VERSION_MAJOR "@_VERSION_MAJOR@"
+#define _VERSION_MINOR "@_VERSION_MINOR@"
+#define _VERSION_REVISION "@_VERSION_REVISION@"
+#define _VERSION_STRING (_VERSION_MAJOR "." _VERSION_MINOR "." _VERSION_REVISION)
+
+#endif
+EOF
+
+(cd project/ && curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png)
+curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeLists.txt
+curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeSettings.json
 
 echo
 echo 'Initializing Git'
 git init
 echo 'Adding README as an init commit'
-git add README.md .gitignore SConstruct
+git add README.md .gitignore CMakeLists.txt CMakeSettings.json
 git commit -m 'init'
 
 echo
-echo 'Adding the godot-cpp submodule'
-git submodule add https://github.com/GodotNativeTools/godot-cpp.git include/godot-cpp
-echo 'Populating...'
-git submodule update --init --recursive
-
-echo
-echo 'Commiting current project'
-git add .
-git commit -m 'final init'
-
-echo
-yn "Build godot-cpp?"
-if [ $? -eq 0 ]; then
-  cd include/godot-cpp/
-  scons platform=linux use_llvm=yes generate_bindings=yes -j4 bits=64 target=debug
-  cd ../
-else
-  echo "Compile with the following:"
-  echo 'Debug:   scons platform=linux use_llvm=yes generate_bindings=yes -j4 bits=64 target=debug'
-  echo 'Release: scons platform=linux use_llvm=yes generate_bindings=yes -j4 bits=64 target=release'
-fi
-
-echo
 echo "$NAME setup is complete!"
-echo "To begin, import the \"project\" directory into Godot. :)"
+echo "Set the Workspace Folder to $NAME in your IDE to edit source."
+echo "To begin working in Godot, import the \"project\" directory. :)"
