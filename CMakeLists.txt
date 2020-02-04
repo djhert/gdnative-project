@@ -16,7 +16,7 @@ configure_file (
 )
 
 # Default to "Release", use -DCMAKE_BUILD_TYPE=Debug for debug
-if(NOT CMAKE_BUILD_TYPE) 
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 set(CMAKE_CXX_STANDARD 17)
@@ -56,7 +56,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
   set(L_FLAGS "${L_FLAGS} /WX /INCREMENTAL:NO")
   if("${CMAKE_BUILD_TYPE}" MATCHES Release)
     set(C_FLAGS "${C_FLAGS} /02 /DNDEBUG /MD")
-  else() 
+  else()
     set(C_FLAGS "${C_FLAGS} /MDd /D_DEBUG")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
@@ -66,7 +66,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
   set(C_FLAGS "${C_FLAGS} -fPIC -Wwrite-strings")
   if("${CMAKE_BUILD_TYPE}" MATCHES Release)
     set(C_FLAGS "${C_FLAGS} -O3 -DNDEBUG")
-  else() 
+  else()
     set(C_FLAGS "${C_FLAGS} -g -D_DEBUG")
   endif()
 endif()
@@ -99,7 +99,8 @@ add_dependencies(${PROJECT_NAME} libgodot-cpp)
 
 # Set target features
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "lib${PROJECT_NAME}.${BITS}")
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "lib")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${BITS}")
 
 # Include godot-cpp and other needed stuff
 target_include_directories(${PROJECT_NAME}

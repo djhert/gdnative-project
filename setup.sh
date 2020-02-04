@@ -2,20 +2,6 @@
 
 NAME=$(basename $PWD)
 
-yn() {
-  while true; do
-    printf "$1 [y/n] "
-    read a
-    if [ "$a" == "y" ]; then
-      return 0
-    elif [ "$a" == "n" ]; then
-      return 1
-    else
-      echo "$a is not valid"
-    fi
-  done
-}
-
 echo 'Godot Init Script'
 echo
 echo 'Creating a new README file'
@@ -112,7 +98,6 @@ build/
 out/
 .vscode/
 .vs/
-include/godot-cpp
 setup.sh
 EOF
 
@@ -145,8 +130,19 @@ echo
 echo 'Initializing Git'
 git init
 echo 'Adding README as an init commit'
-git add README.md .gitignore CMakeLists.txt CMakeSettings.json
+git add README.md .gitignore
 git commit -m 'init'
+
+echo
+echo 'Adding the godot-cpp submodule'
+git submodule add -b 3.2 https://github.com/GodotNativeTools/godot-cpp.git include/godot-cpp
+echo 'Populating...'
+git submodule update --init --recursive
+
+echo
+echo 'Commiting current project'
+git add .
+git commit -m "$NAME project setup"
 
 echo
 echo "$NAME setup is complete!"
