@@ -2,6 +2,18 @@
 
 NAME=$(basename $PWD)
 
+yn() {
+    while printf "$1 [y/n] " && read a
+    do
+        case $a in
+            ([yY]) return 0;;
+            ([nN]) return 1;;
+            (*) printf "$a is not valid\n";;
+        esac
+    done
+}
+
+
 echo 'Godot Init Script'
 echo
 echo 'Creating a new README file'
@@ -140,9 +152,16 @@ echo 'Populating...'
 git submodule update --init --recursive
 
 echo
+yn "Add gdregistry as a submodule?"
+if [ $? -eq 0 ]; then
+    echo 'Adding the gdregistry submodule'
+    git submodule add https://github.com/hlfstr/gdregistry.git source/include/gdregistry
+fi
+
+echo
 echo 'Commiting current project'
 git add .
-git commit -m "$NAME project setup"
+git commit -m "$NAME setup"
 
 echo
 echo "$NAME setup is complete!"

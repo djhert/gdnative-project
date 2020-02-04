@@ -98,5 +98,3 @@ For Windows, open the `project_name` directory in Visual Studio.  Visual Studio 
 ## Notes
 
 * The included `CMakeLists.txt` is set to recursively scan the source folders, but this requires CMake to rebuild any time that a new file is added.  If you get errors when adding a new file, or the auto-completion is not working, rebuild `cmake` using your IDE and everything will work again.
-
-* The `godot-cpp` project is **NOT** included as a git submodule in the project, and is explicitly ignored in the default location of `include/godot-cpp` via the included `.gitignore`.  Instead, `cmake` will download the needed files via git when building and build when/if needed.
