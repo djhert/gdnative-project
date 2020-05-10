@@ -45,6 +45,9 @@ set(OUTPATH "${PROJECT_SOURCE_DIR}/project/lib/${SYSTEM_NAME}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPATH}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${OUTPATH}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${OUTPATH}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPATH}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${OUTPATH}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${OUTPATH}")
 set(CMAKE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 #Check compiler, and set flags appropriately
@@ -72,18 +75,41 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
 endif()
 
 # Setup external godot-cpp project for tracking
-ExternalProject_Add(libgodot-cpp
-  SOURCE_DIR ${PROJECT_SOURCE_DIR}/include/godot-cpp
-  GIT_REPOSITORY https://github.com/GodotNativeTools/godot-cpp
-  GIT_TAG 3.2
-  INSTALL_COMMAND ""
-  UPDATE_COMMAND ""
-  BUILD_BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${BUILD_TYPE}.${BITS}.${GODOT_SUFFIX}
-  STAMP_DIR ${PROJECT_BINARY_DIR}/godot-cpp-stamp
-  BINARY_DIR ${PROJECT_BINARY_DIR}/godot-cpp-build
-)
+if(ANDROID)
+  ExternalProject_Add(libgodot-cpp
+    SOURCE_DIR ${PROJECT_SOURCE_DIR}/include/godot-cpp
+    GIT_REPOSITORY https://github.com/GodotNativeTools/godot-cpp
+    GIT_TAG 3.2
+    INSTALL_COMMAND ""
+    UPDATE_COMMAND ""
+    CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+      "-DANDROID_NDK=${ANDROID_NDK}"
+      "-DANDROID_PLATFORM=android-23"
+      "-DANDROID_ABI=${ANDROID_ABI}"
+      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+    BUILD_BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${ANDROID_ABI}.${BUILD_TYPE}.${GODOT_SUFFIX}
+    STAMP_DIR ${PROJECT_BINARY_DIR}/godot-cpp-stamp
+    BINARY_DIR ${PROJECT_BINARY_DIR}/godot-cpp-build
+  )
+else()
+  ExternalProject_Add(libgodot-cpp
+    SOURCE_DIR ${PROJECT_SOURCE_DIR}/include/godot-cpp
+    GIT_REPOSITORY https://github.com/GodotNativeTools/godot-cpp
+    GIT_TAG 3.2
+    INSTALL_COMMAND ""
+    UPDATE_COMMAND ""
+    CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+    BUILD_BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${BITS}.${BUILD_TYPE}.${GODOT_SUFFIX}
+    STAMP_DIR ${PROJECT_BINARY_DIR}/godot-cpp-stamp
+    BINARY_DIR ${PROJECT_BINARY_DIR}/godot-cpp-build
+  )
+endif()
 add_library(godot-cpp STATIC IMPORTED)
-set_property(TARGET godot-cpp PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${BUILD_TYPE}.${BITS}.${GODOT_SUFFIX})
+if(ANDROID)
+  set_property(TARGET godot-cpp PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${ANDROID_ABI}.${BUILD_TYPE}.${GODOT_SUFFIX})
+else()
+  set_property(TARGET godot-cpp PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${BUILD_TYPE}.${BITS}.${GODOT_SUFFIX})
+endif()
 
 # include directories
 include_directories(${PROJECT_SOURCE_DIR}/include/source,
@@ -100,7 +126,11 @@ add_dependencies(${PROJECT_NAME} libgodot-cpp)
 # Set target features
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "lib")
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${BITS}")
+if(ANDROID)
+	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${SYSTEM_NAME}.${ANDROID_ABI}")
+else()
+  set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${SYSTEM_NAME}.${BITS}")
+endif()
 
 # Include godot-cpp and other needed stuff
 target_include_directories(${PROJECT_NAME}

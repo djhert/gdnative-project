@@ -2,47 +2,33 @@
 
 NAME=$(basename $PWD)
 
+BOLD=$(tput bold)
+GRN=$(tput setaf 2)
+RED=$(tput setaf 1)
+BLUE=$(tput setaf 4)
+ET=$(tput sgr0)
+
 yn() {
-    while printf "$1 [y/n] " && read a
+    while printf $BOLD"$1 [y/n] " && read a
     do
         case $a in
-            ([yY]) return 0;;
-            ([nN]) return 1;;
-            (*) printf "$a is not valid\n";;
+            ([yY]) printf "$ET" && return 0;;
+            ([nN]) printf "$ET" && return 1;;
+            (*) printf $RED"$a is not valid\n"$ET;;
         esac
     done
 }
 
+if [ -d "$PWD/.git" ]; then
+    echo $RED$BOLD"ERROR:$BLUE .git$RED directory already exists.  Exiting..."$ET
+    exit
+fi
 
-echo 'Godot Init Script'
+echo $BOLD'Godot Init Script'$ET
 echo
-echo 'Creating a new README file'
+echo $BOLD"--$GRN Creating base files and structure"$ET
 printf "# $NAME\n" > README.md
-
-echo
-echo 'Creating project directories'
-mkdir -vp project/{assets,scripts,scenes,lib,gdns} include out build source/include
-
-echo
-echo 'Creating project'
-cat << EOF > project/project.godot
-; Engine configuration file.
-; It's best edited using the editor UI and not directly,
-; since the parameters that go here are not all obvious.
-;
-; Format:
-;   [section] ; section goes between []
-;   param=value ; assign values to parameters
-config_version=4
-_global_script_classes=[  ]
-_global_script_class_icons={
-}
-[application]
-config/name="$NAME"
-config/icon="res://icon.png"
-[rendering]
-environment/default_environment="res://default_env.tres"
-EOF
+echo "created file: 'README.md'"
 
 cat << EOF > .gitignore
 *.d
@@ -112,6 +98,31 @@ out/
 .vs/
 setup.sh
 EOF
+echo "created file: '.gitignore'"
+
+mkdir -vp project/{assets,scripts,scenes,lib,gdns} include out build source/include
+
+echo
+echo $BOLD"--$GRN Creating Godot project"$ET
+cat << EOF > project/project.godot
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+config_version=4
+_global_script_classes=[  ]
+_global_script_class_icons={
+}
+[application]
+config/name="$NAME"
+config/icon="res://icon.png"
+[rendering]
+environment/default_environment="res://default_env.tres"
+EOF
+echo "created file: 'project/project.godot'"
 
 cat << EOF > project/default_env.tres
 [gd_resource type="Environment" load_steps=2 format=2]
@@ -120,50 +131,51 @@ cat << EOF > project/default_env.tres
 background_mode = 2
 background_sky = SubResource( 1 )
 EOF
+echo "created file: 'project/default_env.tres'"
 
 cat << EOF > source/version.hpp.in
 #ifndef __MYVERSION_HPP__
 #define __MYVERSION_HPP__
-
 #define _PROJECT_NAME "@PROJECT_NAME@"
 #define _VERSION_MAJOR "@_VERSION_MAJOR@"
 #define _VERSION_MINOR "@_VERSION_MINOR@"
 #define _VERSION_REVISION "@_VERSION_REVISION@"
 #define _VERSION_STRING (_VERSION_MAJOR "." _VERSION_MINOR "." _VERSION_REVISION)
-
 #endif
 EOF
+echo "created file: 'source/version.hpp.in'"
 
 (cd project/ && curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png)
+echo "downloaded file: 'project/icon.png'"
 curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeLists.txt
+echo "downloaded file: 'CMakeLists.txt'"
 curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeSettings.json
+echo "downloaded file: 'CMakeSettings.json'"
 
 echo
-echo 'Initializing Git'
+echo $BOLD"--$GRN Initializing Git"$ET
 git init
-echo 'Adding README as an init commit'
 git add README.md .gitignore
 git commit -m 'init'
 
 echo
-echo 'Adding the godot-cpp submodule'
+echo $BOLD"-- $GRN Adding the$BLUE godot-cpp$GRN submodule"$ET
 git submodule add -b 3.2 https://github.com/GodotNativeTools/godot-cpp.git include/godot-cpp
-echo 'Populating...'
 git submodule update --init --recursive
 
 echo
-yn "Add gdregistry as a submodule?"
+yn "Add$BLUE gdregistry$(tput setaf 7) as a submodule?"
 if [ $? -eq 0 ]; then
-    echo 'Adding the gdregistry submodule'
+    echo $BOLD"--$GRN Adding the$BLUE gdregistry$GRN submodule"$ET
     git submodule add https://github.com/hlfstr/gdregistry.git source/include/gdregistry
 fi
 
 echo
-echo 'Commiting current project'
+echo $BOLD"--$GRN Commiting current project"$ET
 git add .
 git commit -m "$NAME setup"
 
 echo
-echo "$NAME setup is complete!"
-echo "Set the Workspace Folder to $NAME in your IDE to edit source."
-echo "To begin working in Godot, import the \"project\" directory. :)"
+echo $BOLD"$BLUE$NAME$GRN setup is complete!"$ET
+echo $BOLD"Set the Workspace Folder to $NAME in your IDE to edit source."
+echo "To begin working in Godot, import the \"project\" directory. :)$ET"

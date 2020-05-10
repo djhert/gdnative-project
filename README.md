@@ -12,8 +12,8 @@ Once completed, simply import the newly created **project** directory in Godot.
 
 To edit the source, open the **project-name** folder in your IDE of choice (tested with `vscode` on Linux and `Visual Studio` on Windows), the CMakeLists.txt will be automatically parsed. 
 
-### ON Windows
-Make sure you have the "Git Bash" application installed via Git for Windows.
+### On Windows
+You will need to have a Unix environment setup to get this to work.  I recommend Git Bash from here: https://gitforwindows.org/
 
 You can then use that application to follow the above instructions to setup the project.
 
@@ -35,7 +35,7 @@ You can then use that application to follow the above instructions to setup the 
 
 After the setup script is completed, a project directory will have been created with the intention to be used in the following way:  
 
-```bash
+```
 Name/
 ├── include/
 |   ├── # C++ Bindings/3rd party libraries
@@ -45,21 +45,22 @@ Name/
 ├── project/
 │   ├── assets/
 |       └── # Project Assets
-│   ├── default_env.tres
 │   ├── gdns/
 |       └── # Godot NativeScripts
-│   ├── icon.png
 │   ├── lib/
 |   |   └── # Compiled GDNative libraries
-│   ├── project.godot
 │   ├── scenes/
 |   |   └── # Godot Scenes
-│   └── scripts/
+│   ├── scripts/
 |       └── # Godot Scripts
+│   ├── icon.png
+│   ├── default_env.tres
+│   └── project.godot
+├── CMakeLists.txt
+├── CMakeSettings.json
 ├── README.md
-├── SConstruct
 └── source/
-    ├── include / # Source that needs to be compiled with the library 
+    ├── include / # libraries that needs to be compiled with the library (ex. GDRegistry)
     └── # C++ GDNative Source goes here
 ```
 
@@ -76,7 +77,7 @@ $ make
 ```
 
 * Running the above will build a Release build.
-* To build a debug build, add `-DCMAKE_BUILD_TYPE=Debug`
+* To build with debug, add `-DCMAKE_BUILD_TYPE=Debug`
 * To build the `compile_commands.json` add `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
 * The compiled library's name is derived from the project folder's name.
 * Output set to "lib" folder in the project directory
@@ -85,9 +86,7 @@ $ make
 ```sh
 $ mkdir build
 $ cd build
-$ export CC=clang
-$ export CXX=clang++
-$ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+$ CC=clang CXX=clang++ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 $ make
 ```
 
