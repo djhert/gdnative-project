@@ -31,12 +31,6 @@ printf "# $NAME\n" > README.md
 echo "created file: 'README.md'"
 
 cat << EOF > .gitignore
-*.d
-*.slo
-*.lo
-*.o
-*.obj
-*.os
 *.so
 *.dll
 *.a
@@ -46,65 +40,27 @@ cat << EOF > .gitignore
 *.app
 *.x86_64
 *.apk
-*_i.c
-*_p.c
-*_h.h
-*.ilk
-*.obj
-*.iobj
-*.pch
-*.pdb
-*.ipdb
-*.pgc
-*.pgd
-*.rsp
-*.sbr
-*.tlb
-*.tli
-*.tlh
-*.tmp
-*.tmp_proj
-*.manifest
-*_wpftmp.csproj
-*.log
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.svclog
-*.scc
 .import/
 export.cfg
 export_presets.cfg
 .mono/
-.sconsign.dblite
-__pycache__
-bin/*
-*-prefix/
 CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-build/
-out/
+source/build/
+out/*
+!out/.gdignore
 .vscode/
 .vs/
 setup.sh
 EOF
 echo "created file: '.gitignore'"
 
-mkdir -vp project/{assets,scripts,scenes,lib,gdns} include out build source/include
+mkdir -vp assets scripts scenes out lib gdns source/{build,include,src}
+printf "#Godot Ignore\n" > source/.gdignore
+printf "#Godot Ignore\n" > out/.gdignore
 
 echo
 echo $BOLD"--$GRN Creating Godot project"$ET
-cat << EOF > project/project.godot
+cat << EOF > project.godot
 ; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
 ; since the parameters that go here are not all obvious.
@@ -122,58 +78,110 @@ config/icon="res://icon.png"
 [rendering]
 environment/default_environment="res://default_env.tres"
 EOF
-echo "created file: 'project/project.godot'"
+echo "created file: 'project.godot'"
 
-cat << EOF > project/default_env.tres
+cat << EOF > default_env.tres
 [gd_resource type="Environment" load_steps=2 format=2]
 [sub_resource type="ProceduralSky" id=1]
 [resource]
 background_mode = 2
 background_sky = SubResource( 1 )
 EOF
-echo "created file: 'project/default_env.tres'"
+echo "created file: 'default_env.tres'"
 
 cat << EOF > source/version.hpp.in
-#ifndef __MYVERSION_HPP__
-#define __MYVERSION_HPP__
-#define _PROJECT_NAME "@PROJECT_NAME@"
-#define _VERSION_MAJOR "@_VERSION_MAJOR@"
-#define _VERSION_MINOR "@_VERSION_MINOR@"
-#define _VERSION_REVISION "@_VERSION_REVISION@"
-#define _VERSION_STRING (_VERSION_MAJOR "." _VERSION_MINOR "." _VERSION_REVISION)
+#ifndef _@VER_NAME@_INFO
+#ifdef _DEBUG
+#define _@VER_NAME@_INFO ("@PROJECT_NAME@ v@_VERSION_MAJOR@.@_VERSION_MINOR@.@_VERSION_REVISION@-@_VERSION_TAG@")
+#else
+#define _@VER_NAME@_INFO ("@PROJECT_NAME@ v@_VERSION_MAJOR@.@_VERSION_MINOR@.@_VERSION_REVISION@")
+#endif
+#endif
+#ifndef _@VER_NAME@_VERSION
+#ifdef _DEBUG
+#define _@VER_NAME@_VERSION ("@_VERSION_MAJOR@.@_VERSION_MINOR@.@_VERSION_REVISION@-@_VERSION_TAG@")
+#else
+#define _@VER_NAME@_VERSION ("@_VERSION_MAJOR@.@_VERSION_MINOR@.@_VERSION_REVISION@")
+#endif
 #endif
 EOF
 echo "created file: 'source/version.hpp.in'"
 
-(cd project/ && curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png)
-echo "downloaded file: 'project/icon.png'"
-curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeLists.txt
-echo "downloaded file: 'CMakeLists.txt'"
-curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeSettings.json
-echo "downloaded file: 'CMakeSettings.json'"
+cat << 'EOF' > source/version.txt
+# Set version number
+set (_VERSION_MAJOR 0)
+set (_VERSION_MINOR 0)
+set (_VERSION_REVISION 0)
+
+##=- Do not edit below this line -=##
+string (TOUPPER ${PROJECT_NAME} VER_NAME)
+execute_process(COMMAND git rev-parse --short HEAD
+RESULT_VARIABLE _res_dump
+OUTPUT_VARIABLE _VERSION_TAG
+WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+# sometimes there is a newline depending on terminal, remove that
+string(REPLACE "\n" "" _VERSION_TAG ${_VERSION_TAG})
+
+configure_file (
+    "${PROJECT_SOURCE_DIR}/version.hpp.in"
+    "${PROJECT_BINARY_DIR}/gen/version.hpp"
+)
+EOF
+echo "created file: 'source/version.txt'"
+
+cat << EOF > lib/lib$NAME.gdnlib
+[general]
+singleton=false
+load_once=true
+symbol_prefix="godot_"
+reloadable=true
+[entry]
+Android.armeabi-v7a="res://lib/android/lib$NAME.armeabi-v7a.so"
+Android.arm64-v8a="res://lib/android/lib$NAME.arm64-v8a.so"
+Android.x86="res://lib/android/lib$NAME.x86.so"
+Android.x86_64="res://lib/android/lib$NAME.x86_64.so"
+Windows.64="res://lib/windows/lib$NAME.64.dll"
+Windows.32="res://lib/windows/lib$NAME.32.dll"
+X11.64="res://lib/linux/lib$NAME.64.so"
+X11.32="res://lib/linux/lib$NAME.32.so"
+[dependencies]
+Android.armeabi-v7a=[  ]
+Android.arm64-v8a=[  ]
+Android.x86=[  ]
+Android.x86_64=[  ]
+Windows.64=[  ]
+Windows.32=[  ]
+X11.64=[  ]
+X11.32=[  ]
+EOF
+
+curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png
+echo "downloaded file: 'icon.png'"
+(cd source/ && curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeLists.txt)
+echo "downloaded file: 'source/CMakeLists.txt'"
+(cd source/ && curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeSettings.json)
+echo "downloaded file: 'source/CMakeSettings.json'"
 
 echo
 echo $BOLD"--$GRN Initializing Git"$ET
 git init
-git add README.md .gitignore
-git commit -m 'init'
 
 echo
 echo $BOLD"-- $GRN Adding the$BLUE godot-cpp$GRN submodule"$ET
-git submodule add -b 3.2 https://github.com/GodotNativeTools/godot-cpp.git include/godot-cpp
-git submodule update --init --recursive
+git submodule add -b 3.2 https://github.com/GodotNativeTools/godot-cpp.git source/include/godot-cpp
 
 echo
 yn "Add$BLUE gdregistry$(tput setaf 7) as a submodule?"
 if [ $? -eq 0 ]; then
     echo $BOLD"--$GRN Adding the$BLUE gdregistry$GRN submodule"$ET
-    git submodule add https://github.com/hlfstr/gdregistry.git source/include/gdregistry
+    git submodule add https://github.com/hlfstr/gdregistry.git source/src/gdregistry
 fi
+git submodule update --init --recursive
 
 echo
 echo $BOLD"--$GRN Commiting current project"$ET
 git add .
-git commit -m "$NAME setup"
+git commit -m "hello $NAME"
 
 echo
 echo $BOLD"$BLUE$NAME$GRN setup is complete!"$ET
