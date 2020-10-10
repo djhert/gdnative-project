@@ -16,6 +16,7 @@ void GDExample::_init() {
 	// Showing the versioning
 #ifdef _VERSIONED
 	Godot::print(_EXAMPLE_INFO);
+	Godot::print(_GDREGISTRY_INFO);
 #endif
 	// initialize any variables here
 	time_passed = 0.0;

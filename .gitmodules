@@ -1,7 +1,7 @@
-[submodule "example/source/src/gdregistry"]
-	path = example/source/src/gdregistry
-	url = https://github.com/hlfstr/gdregistry.git
 [submodule "example/source/include/godot-cpp"]
 	path = example/source/include/godot-cpp
 	url = https://github.com/GodotNativeTools/godot-cpp.git
 	branch = 3.2
+[submodule "example/source/include/gdregistry"]
+	path = example/source/include/gdregistry
+	url = https://github.com/hlfstr/gdregistry.git

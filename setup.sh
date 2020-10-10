@@ -24,7 +24,7 @@ if [ -d "$PWD/.git" ]; then
     exit
 fi
 
-echo $BOLD'Godot Init Script'$ET
+echo $BOLD'GDNative Init Script'$ET
 echo
 echo $BOLD"--$GRN Creating base files and structure"$ET
 printf "# $NAME\n" > README.md
@@ -45,9 +45,9 @@ export.cfg
 export_presets.cfg
 .mono/
 CMakeLists.txt.user
-source/build/
+build/
 out/*
-!out/.gdignore
+!.gdignore
 .vscode/
 .vs/
 setup.sh
@@ -122,9 +122,9 @@ WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 # sometimes there is a newline depending on terminal, remove that
 string(REPLACE "\n" "" _VERSION_TAG ${_VERSION_TAG})
 
-configure_file (
+CONFIGURE_FILE (
     "${PROJECT_SOURCE_DIR}/version.hpp.in"
-    "${PROJECT_BINARY_DIR}/gen/version.hpp"
+    "${VERSIONS_DIR}/version-${VER_NAME}.hpp"
 )
 EOF
 echo "created file: 'source/version.txt'"
@@ -155,12 +155,12 @@ X11.64=[  ]
 X11.32=[  ]
 EOF
 
+echo "downloading file: 'icon.png'"
 curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png
-echo "downloaded file: 'icon.png'"
+echo "downloading file: 'source/CMakeLists.txt'"
 (cd source/ && curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeLists.txt)
-echo "downloaded file: 'source/CMakeLists.txt'"
+echo "downloading file: 'source/CMakeSettings.json'"
 (cd source/ && curl -sO https://raw.githubusercontent.com/hlfstr/gdnative-project/master/CMakeSettings.json)
-echo "downloaded file: 'source/CMakeSettings.json'"
 
 echo
 echo $BOLD"--$GRN Initializing Git"$ET
@@ -174,7 +174,7 @@ echo
 yn "Add$BLUE gdregistry$(tput setaf 7) as a submodule?"
 if [ $? -eq 0 ]; then
     echo $BOLD"--$GRN Adding the$BLUE gdregistry$GRN submodule"$ET
-    git submodule add https://github.com/hlfstr/gdregistry.git source/src/gdregistry
+    git submodule add https://github.com/hlfstr/gdregistry.git source/include/gdregistry
 fi
 git submodule update --init --recursive
 
@@ -186,4 +186,4 @@ git commit -m "hello $NAME"
 echo
 echo $BOLD"$BLUE$NAME$GRN setup is complete!"$ET
 echo $BOLD"Set the Workspace Folder to $NAME in your IDE to edit source."
-echo "To begin working in Godot, import the \"project\" directory. :)$ET"
+echo "To begin working in Godot, import the \"$NAME\" directory. :)$ET"

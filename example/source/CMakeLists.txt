@@ -1,150 +1,159 @@
-cmake_minimum_required(VERSION 3.15)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.15)
 # Set name of project to current directory name
-get_filename_component(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
-get_filename_component(ProjectId ${ProjectId} NAME)
-string(REPLACE " " "_" ProjectId ${ProjectId})
-project(${ProjectId} LANGUAGES CXX)
+GET_FILENAME_COMPONENT(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+GET_FILENAME_COMPONENT(ProjectId ${ProjectId} NAME)
+STRING(REPLACE " " "_" ProjectId ${ProjectId})
+PROJECT(${ProjectId} LANGUAGES CXX)
 
-include(ExternalProject)
 
-# include the version.txt
-include(${PROJECT_SOURCE_DIR}/version.txt OPTIONAL)
+SET(VERSIONS_DIR ${PROJECT_BINARY_DIR}/versions)
 
-# Default to "Release", use -DCMAKE_BUILD_TYPE=Debug for debug
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-set(CMAKE_CXX_STANDARD 17)
+# reset and include the version.txt
+FILE(REMOVE_RECURSE ${VERSIONS_DIR})
+INCLUDE(${PROJECT_SOURCE_DIR}/version.txt OPTIONAL)
+
+# Default to "Debug", use -DCMAKE_BUILD_TYPE=Release for release build
+IF(NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE Debug)
+ENDIF()
+SET(CMAKE_CXX_STANDARD 17)
 
 # Variables used later in branches
-set(C_FLAGS )
-set(L_FLAGS )
-
-# godot-cpp prefix and suffix for different platforms
-set(GODOT_PREFIX )
-set(GODOT_SUFFIX )
+SET(C_FLAGS )
+SET(L_FLAGS )
 
 # Get Bits of OS
-set(BITS 32)
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set(BITS 64)
-endif()
+SET(BITS 32)
+IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  SET(BITS 64)
+ENDIF()
 
 # Get system name
-string(TOLOWER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME)
+STRING(TOLOWER ${CMAKE_SYSTEM_NAME} SYSTEM_NAME)
 # Get Build type
-string(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
+STRING(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
 
 # Set output directory
-set(OUTPATH "${PROJECT_SOURCE_DIR}/../lib/${SYSTEM_NAME}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPATH}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${OUTPATH}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${OUTPATH}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPATH}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${OUTPATH}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${OUTPATH}")
-set(CMAKE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+SET(OUTPATH "${PROJECT_SOURCE_DIR}/../lib/${SYSTEM_NAME}")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPATH}")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${OUTPATH}")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${OUTPATH}")
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPATH}")
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${OUTPATH}")
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${OUTPATH}")
+SET(CMAKE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 #Check compiler, and set flags appropriately
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-  # For some reason, windows builds it as "godot-cpp" instead of "libgodot-cpp"
-  set(GODOT_PREFIX "godot-cpp")
-  set(GODOT_SUFFIX "lib")
-  set(C_FLAGS "${C_FLAGS} /DWIN32 /D_WIN32 /D_WINDOWS /W3 /GR /D_CRT_SECURE_NO_WARNINGS /EHsc")
-  set(L_FLAGS "${L_FLAGS} /WX /INCREMENTAL:NO")
-  if("${CMAKE_BUILD_TYPE}" MATCHES Release)
-    set(C_FLAGS "${C_FLAGS} /02 /DNDEBUG /MD")
-  else()
-    set(C_FLAGS "${C_FLAGS} /MDd /D_DEBUG")
-  endif()
-elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "(GNU|Clang)")
-  # Manually define since windows names differently
-  set(GODOT_PREFIX "libgodot-cpp")
-  set(GODOT_SUFFIX "a")
-  set(C_FLAGS "${C_FLAGS} -fPIC -Wwrite-strings")
-  if("${CMAKE_BUILD_TYPE}" MATCHES Release)
-    set(C_FLAGS "${C_FLAGS} -O3 -DNDEBUG")
-  else()
-    set(C_FLAGS "${C_FLAGS} -g -D_DEBUG")
-  endif()
-endif()
-
-# Setup external godot-cpp project for tracking
-if(ANDROID)
-  ExternalProject_Add(libgodot-cpp
-    SOURCE_DIR ${PROJECT_SOURCE_DIR}/include/godot-cpp
-    GIT_REPOSITORY https://github.com/GodotNativeTools/godot-cpp
-    GIT_TAG 3.2
-    INSTALL_COMMAND ""
-    UPDATE_COMMAND ""
-    CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
-      "-DANDROID_NDK=${ANDROID_NDK}"
-      "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
-      "-DANDROID_ABI=${ANDROID_ABI}"
-      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    BUILD_BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${ANDROID_ABI}.${BUILD_TYPE}.${GODOT_SUFFIX}
-    STAMP_DIR ${PROJECT_BINARY_DIR}/godot-cpp-stamp
-    BINARY_DIR ${PROJECT_BINARY_DIR}/godot-cpp-build
-  )
-else()
-  ExternalProject_Add(libgodot-cpp
-    SOURCE_DIR ${PROJECT_SOURCE_DIR}/include/godot-cpp
-    GIT_REPOSITORY https://github.com/GodotNativeTools/godot-cpp
-    GIT_TAG 3.2
-    INSTALL_COMMAND ""
-    UPDATE_COMMAND ""
-    CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-    "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-    BUILD_BYPRODUCTS ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${BUILD_TYPE}.${BITS}.${GODOT_SUFFIX}
-    STAMP_DIR ${PROJECT_BINARY_DIR}/godot-cpp-stamp
-    BINARY_DIR ${PROJECT_BINARY_DIR}/godot-cpp-build
-  )
-endif()
-
-add_library(godot-cpp STATIC IMPORTED)
-if(ANDROID)
-  set_target_properties(godot-cpp PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${ANDROID_ABI}.${BUILD_TYPE}.${GODOT_SUFFIX})
-else()
-  set_target_properties(godot-cpp PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/include/godot-cpp/bin/${GODOT_PREFIX}.${SYSTEM_NAME}.${BUILD_TYPE}.${BITS}.${GODOT_SUFFIX})
-endif()
+IF("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+  SET(C_FLAGS "${C_FLAGS} /DWIN32 /D_WIN32 /D_WINDOWS /W3 /GR /D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /EHsc")
+  SET(L_FLAGS "${L_FLAGS} /WX /INCREMENTAL:NO")
+  IF("${CMAKE_BUILD_TYPE}" MATCHES Release)
+    SET(C_FLAGS "${C_FLAGS} /02 /DNDEBUG /MD")
+  ELSE()
+    SET(C_FLAGS "${C_FLAGS} /MDd /D_DEBUG")
+  ENDIF()
+ELSE()
+  SET(C_FLAGS "${C_FLAGS} -fPIC -Wwrite-strings")
+  IF("${CMAKE_BUILD_TYPE}" MATCHES Release)
+    SET(C_FLAGS "${C_FLAGS} -O3 -DNDEBUG")
+  ELSE()
+    SET(C_FLAGS "${C_FLAGS} -g -D_DEBUG")
+  ENDIF()
+ENDIF()
 
 # Find all source files in source dir
-file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.c**)
-file(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/src/*.h**)
+FILE(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.c**)
+FILE(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/src/*.h**)
 
 # Define library
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
-add_dependencies(${PROJECT_NAME} libgodot-cpp)
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 
 # Set target features
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "lib")
-if(ANDROID)
-	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${ANDROID_ABI}")
-else()
-  set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${BITS}")
-endif()
+TARGET_COMPILE_FEATURES(${PROJECT_NAME} PUBLIC cxx_std_17)
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES PREFIX "lib")
+IF(ANDROID)
+	SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${ANDROID_ABI}")
+ELSE()
+  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${BITS}")
+ENDIF()
 
 # Include godot-cpp and other needed stuff
-target_include_directories(${PROJECT_NAME}
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME}
   PUBLIC
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/include/godot-cpp/include
   ${PROJECT_SOURCE_DIR}/include/godot-cpp/include/core
   ${PROJECT_SOURCE_DIR}/include/godot-cpp/include/gen
-  ${PROJECT_BINARY_DIR}/gen
+  ${VERSIONS_DIR}
   ${PROJECT_SOURCE_DIR}/src
 )
 
-# Include godot_headers and ignore any warnings
-target_include_directories(${PROJECT_NAME}
+# Include godot_headers
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME}
   SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/include/godot-cpp/godot_headers
 )
 
 # Set compile flags
-set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS ${C_FLAGS})
-set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS ${L_FLAGS})
+SET_PROPERTY(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS ${C_FLAGS})
+SET_PROPERTY(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS ${L_FLAGS})
 
+# Include godot-cpp
+MESSAGE(STATUS "Include: " godot-cpp)
+ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/include/godot-cpp ${PROJECT_BINARY_DIR}/godot-cpp)
+# Since we should have found godot-cpp, include the project now
+ADD_DEPENDENCIES(${PROJECT_NAME} godot-cpp)
 # Include libgodot-cpp
-target_link_libraries(${PROJECT_NAME} godot-cpp)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} godot-cpp)
+
+# Define current folder for reference
+SET(SourceDir ${PROJECT_SOURCE_DIR})
+
+## Macro to search subdirectories and return list
+MACRO(SUBDIRS result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
+# Check includes for subdirs to include
+SUBDIRS(subdirs ${PROJECT_SOURCE_DIR}/include)
+FOREACH(subdir ${subdirs})
+  IF(${subdir} STREQUAL "godot-cpp")
+    CONTINUE()
+  ENDIF()
+  SET(binarydir ${PROJECT_BINARY_DIR}/${subdir})
+  SET(fullsubdir ${PROJECT_SOURCE_DIR}/include/${subdir})
+  IF(EXISTS ${fullsubdir}/CMakeLists.txt)
+    MESSAGE(STATUS "Include: " ${subdir})
+    ADD_SUBDIRECTORY(${fullsubdir} ${binarydir})
+  ENDIF()
+ENDFOREACH()
+
+# Check addon subdirs for stuff
+GET_FILENAME_COMPONENT(AddonDir ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+SET(AddonDir ${AddonDir}/addons)
+SUBDIRS(subdirs ${AddonDir})
+FOREACH(subdir ${subdirs})
+  SET(binarydir ${PROJECT_BINARY_DIR}/${subdir})
+  SET(fullsubdir ${AddonDir}/${subdir}/source)
+  IF(EXISTS ${fullsubdir}/CMakeLists.txt)
+    MESSAGE(STATUS "Module: " ${subdir})
+    ADD_SUBDIRECTORY(${fullsubdir} ${binarydir})
+  ENDIF()
+ENDFOREACH()
+
+# Now that everything is setup, let's finalize versioning
+MACRO(cat OUT IN)
+  FILE(READ ${IN} CONTENTS)
+  FILE(APPEND ${OUT} "${CONTENTS}")
+ENDMACRO()
+
+FILE(GLOB VERS ${VERSIONS_DIR}/version-*.hpp)
+FOREACH(ver ${VERS})
+  cat(${VERSIONS_DIR}/version.hpp ${ver})
+ENDFOREACH()
