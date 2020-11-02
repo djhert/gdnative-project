@@ -1,4 +1,4 @@
-# ![Godot](https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png) GDNative Project 
+# ![Godot](https://raw.githubusercontent.com/hlfstr/gdnative-project/master/icon.png) GDNative Project
 A base to start a new Godot Project and have a coherent file structure.
 
 ## Getting Started
@@ -6,7 +6,7 @@ Run the `setup.sh` script in a new directory.
 ```sh
 $ mkdir project-name
 $ cd project-name
-$ sh -c "$(curl -fsSL https://raw.githubusercontent.com/hlfstr/gdnative-project/master/setup.sh)"
+$ sh -c "$(curl -fsSL https://raw.githubusercontent.com/hlfstr/gdnative-project/master/gdnative-init)"
 ```
 Once completed, simply import the **project-name** directory in Godot.
 
@@ -19,7 +19,7 @@ The main configuration that is needed for this to work properly is to have CMake
 
 #### Visual Studio Code setup - MacOS/Linux
 
-In order for this to work you must change your `cmake.buildDirectory` and `cmake.sourceDirectory` settings to the `source/build` directory and `source/` respectively. 
+In order for this to work you must change your `cmake.buildDirectory` and `cmake.sourceDirectory` settings to the `source/build` directory and `source/` respectively.
 
 **Extensions required:**
 **[CMake-Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)** by Microsoft
@@ -33,7 +33,7 @@ The following is the required `.vscode/settings.json`
 {
     "cmake.buildDirectory": "${workspaceFolder}/source/build",
     "cmake.sourceDirectory": "${workspaceFolder}/source",
-    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools"
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }
 ```
 You may then issue builds using VSCode as you would any CMake project!  If you include **[Godot-Tools](https://marketplace.visualstudio.com/items?itemName=geequlim.godot-tools)**, it becomes a very nice setup as everything is controlled and edited in VSCode.
@@ -52,7 +52,7 @@ Visual Studio can simply import the project at **project-name** and will configu
 * Nice file structure for easy project organization
 * Includes .gitignore that should cover everything
 * Uses CMake to build the project, also builds the `godot-cpp` bindings
-* Defines _DEBUG constant for easy debugging when compiling for debug target
+* Defines `_DEBUG` constant for easy debugging when compiling for debug target
 
     Usage:
     ```cpp
@@ -71,7 +71,7 @@ set (_VERSION_MINOR 0)
 set (_VERSION_REVISION 0)
 ```
 
-If you are building to the Debug target, then the Git tag will be included in the Version string available.  For an implementation of the versioning, it is recommended that **[GDRegistry](https://github.com/hlfstr/gdregistry)** is included on setup. 
+If you are building to the Debug target, then the Git tag will be included in the Version string available.  For an implementation of the versioning, it is recommended that **[GDRegistry](https://github.com/hlfstr/gdregistry)** is included on setup.
 
 The Version Strings available to you depends on the name of the project to avoid any conflicts.  For example, a project named `example` would have the following:
 ```cpp
@@ -83,32 +83,32 @@ The Version Strings available to you depends on the name of the project to avoid
 
 ## Organization
 
-After the setup script is completed, a project directory will have been created with the intention to be used in the following way:  
+After the setup script is completed, a project directory will have been created with the intention to be used in the following way:
 
 ```
 project-name/
-├── assets/
+├── assets/ # Assets for your project
 ├── default_env.tres
-├── gdns/
+├── gdns/ # Native Scripts
 ├── .gitignore
 ├── icon.png
-├── lib/
+├── lib/ # Compiled library
 │   └── libexample.gdnlib
-├── out/
+├── out/ # Exported projects
 │   └── .gdignore
 ├── project.godot
 ├── README.md
-├── scenes/
-├── scripts/
-└── source/
+├── scenes/ # Scenes
+├── scripts/ # Scripts
+└── source/ # C++ Source
     ├── build/
     ├── CMakeLists.txt
     ├── CMakeSettings.json
     ├── .gdignore
     ├── include/
-    |   └── godot-cpp/ # godot-cpp bindings as a submodule
+    │   ├── godot-cpp/ # godot-cpp bindings as a submodule
+    │   └── gdregistry/ # gdregistry bindings as a submodule, if selected
     ├── src/
-    |   └── gdregistry/ # gdregistry bindings as a submodule, if selected
     ├── version.hpp.in # version template
     └── version.txt # version file
 ```
@@ -166,7 +166,7 @@ $ make
 * `-DANDROID_PLATFORM=android-23`
     * Sets the minimum platform for the NDK.  `android-23` is the lowest for Godot, and perfectly acceptable to use normally.
 * `-DANDROID_ABI=arm64-v8a`
-    * Sets the ABI target.  Acceptable targets are: `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64` 
+    * Sets the ABI target.  Acceptable targets are: `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`
 ## Notes
 
 * The included `CMakeLists.txt` is set to recursively scan the source folders, but this requires CMake to rebuild any time that a new file is added.  If you get errors when adding a new file, or the auto-completion is not working, rebuild `cmake` using your IDE and everything will work again.

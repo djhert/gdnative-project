@@ -8,6 +8,9 @@ RED=$(tput setaf 1)
 BLUE=$(tput setaf 4)
 ET=$(tput sgr0)
 
+GDHEAD=""
+GDRUN=""
+
 yn() {
     while printf $BOLD"$1 [y/n] " && read a
     do
@@ -24,33 +27,34 @@ if [ -d "$PWD/.git" ]; then
     exit
 fi
 
-echo $BOLD'GDNative Init Script'$ET
+echo $BOLD'GDNative Init'$ET
 echo
 echo $BOLD"--$GRN Creating base files and structure"$ET
 printf "# $NAME\n" > README.md
 echo "created file: 'README.md'"
 
 cat << EOF > .gitignore
-*.so
-*.dll
+!.gdignore
 *.a
+*.so
+*.dynlib
 *.lib
+*.dll
 *.exe
 *.out
 *.app
 *.x86_64
+*.x86
 *.apk
-.import/
 export.cfg
 export_presets.cfg
-.mono/
 CMakeLists.txt.user
+.import/
+.mono/
 build/
-out/*
-!.gdignore
+out/
 .vscode/
 .vs/
-setup.sh
 EOF
 echo "created file: '.gitignore'"
 
@@ -115,6 +119,7 @@ set (_VERSION_REVISION 0)
 
 ##=- Do not edit below this line -=##
 string (TOUPPER ${PROJECT_NAME} VER_NAME)
+STRING(REPLACE "-" "" VER_NAME ${VER_NAME})
 execute_process(COMMAND git rev-parse --short HEAD
 RESULT_VARIABLE _res_dump
 OUTPUT_VARIABLE _VERSION_TAG
@@ -175,8 +180,37 @@ yn "Add$BLUE gdregistry$(tput setaf 7) as a submodule?"
 if [ $? -eq 0 ]; then
     echo $BOLD"--$GRN Adding the$BLUE gdregistry$GRN submodule"$ET
     git submodule add https://github.com/hlfstr/gdregistry.git source/include/gdregistry
+    GDHEAD="#include <gdregistry/gdregistry.hpp>"
+    GDRUN="godot::GDRegistry::Run();"
 fi
+
+echo
+echo $BOLD"--$GRN Init git submodules"$ET
 git submodule update --init --recursive
+
+echo
+echo $BOLD"--$GRN Creating library init"$ET
+cat << EOF > source/src/$NAME.cpp
+#include <Godot.hpp>
+$GDHEAD
+
+// Native Init function defined by Godot
+extern "C" void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *o) {
+	godot::Godot::gdnative_init(o);
+}
+
+// Native Terminate function defined by Godot
+extern "C" void GDN_EXPORT godot_gdnative_terminate(godot_gdnative_terminate_options *o) {
+	godot::Godot::gdnative_terminate(o);
+}
+
+// GDNative entry point defined by Godot
+extern "C" void GDN_EXPORT godot_nativescript_init(void *handle) {
+	godot::Godot::nativescript_init(handle);
+    $GDRUN
+}
+EOF
+echo "created file: 'source/src/$NAME.cpp'"
 
 echo
 echo $BOLD"--$GRN Commiting current project"$ET
@@ -185,5 +219,5 @@ git commit -m "hello $NAME"
 
 echo
 echo $BOLD"$BLUE$NAME$GRN setup is complete!"$ET
-echo $BOLD"Set the Workspace Folder to $NAME in your IDE to edit source."
+echo $BOLD"Set the Workspace Folder to \"$NAME\" in your IDE to edit source."
 echo "To begin working in Godot, import the \"$NAME\" directory. :)$ET"
