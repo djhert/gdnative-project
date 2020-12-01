@@ -63,10 +63,10 @@ ENDIF()
 
 # Find all source files in source dir
 FILE(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.c**)
-FILE(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/src/*.h**)
+#FILE(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/src/*.h**)
 
 # Define library
-ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES})
 
 # Set target features
 TARGET_COMPILE_FEATURES(${PROJECT_NAME} PUBLIC cxx_std_17)
@@ -76,22 +76,6 @@ IF(ANDROID)
 ELSE()
   SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}.${BITS}")
 ENDIF()
-
-# Include godot-cpp and other needed stuff
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME}
-  PUBLIC
-  ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/include/godot-cpp/include
-  ${PROJECT_SOURCE_DIR}/include/godot-cpp/include/core
-  ${PROJECT_SOURCE_DIR}/include/godot-cpp/include/gen
-  ${VERSIONS_DIR}
-  ${PROJECT_SOURCE_DIR}/src
-)
-
-# Include godot_headers
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME}
-  SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/include/godot-cpp/godot_headers
-)
 
 # Set compile flags
 SET_PROPERTY(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS ${C_FLAGS})
@@ -104,6 +88,14 @@ ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/include/godot-cpp ${PROJECT_BINARY_DIR}/g
 ADD_DEPENDENCIES(${PROJECT_NAME} godot-cpp)
 # Include libgodot-cpp
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} godot-cpp)
+
+# Include Directores made global
+SET(PROJECT_INCLUDES
+  ${PROJECT_SOURCE_DIR}/include/godot-cpp/include
+  ${PROJECT_SOURCE_DIR}/include/godot-cpp/include/core
+  ${PROJECT_SOURCE_DIR}/include/godot-cpp/include/gen
+  ${VERSIONS_DIR}
+)
 
 # Define current folder for reference
 SET(SourceDir ${PROJECT_SOURCE_DIR})
@@ -146,6 +138,19 @@ FOREACH(subdir ${subdirs})
     ADD_SUBDIRECTORY(${fullsubdir} ${binarydir})
   ENDIF()
 ENDFOREACH()
+
+# Include godot-cpp and other needed stuff
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME}
+  PUBLIC
+  ${PROJECT_INCLUDES}
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/src
+)
+
+# Include godot_headers
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME}
+  SYSTEM PUBLIC ${PROJECT_SOURCE_DIR}/include/godot-cpp/godot_headers
+)
 
 # Now that everything is setup, let's finalize versioning
 MACRO(cat OUT IN)
