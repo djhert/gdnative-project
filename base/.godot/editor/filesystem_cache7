@@ -1,0 +1,17 @@
+102b54792f6b2ef812636a2bdaeb9d34
+::res://::1634562855
+default_env.tres::Environment::-1::1628864664::0::1::::<><>::
+export_presets.cfg::TextFile::-1::1630438023::0::1::::<><>::
+icon.png::StreamTexture2D::5319996072917022134::1628014863::1630001269::1::::<><>::
+README.md::TextFile::-1::1628014860::0::1::::<><>::
+::res://assets/::1634562855
+::res://base/::1634562550
+::res://base/core/::1634562855
+Init.gd::GDScript::-1::1634562566::0::1::::<>Node<>::
+Init.tscn::PackedScene::390040718697085739::1634562803::0::1::::<><>::res://base/core/Init.gd
+SceneManager.tscn::PackedScene::-1::1628016093::0::1::::<><>::
+Settings.gd::GDScript::-1::1634562566::0::1::::<>GSettings<>::
+Settings.tscn::PackedScene::-1::1634562745::0::1::::<><>::res://base/core/Settings.gd
+splash_disable.png::StreamTexture2D::1327127104490094344::1585957759::1634562855::1::::<><>::
+::res://lib/::1628014860
+libbase.gdnlib::GDNativeLibrary::-1::1628014860::0::1::::<><>::

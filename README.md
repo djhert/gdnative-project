@@ -130,8 +130,8 @@ $ make
 * To build the `compile_commands.json` add `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
 * The compiled library's name is derived from the project folder's name.
 * Output set to "lib" folder in the project directory
-* The parser for source files is  recursive, meaning you can have subfolders within the "source" directory of your GDNative source
-* To use clang (recommended) set the `CC` and `CXX` variables before running `cmake`
+* The parser for source files is  recursive, meaning you can have subfolders within the "src" directory of your GDNative source
+* To use clang set the `CC` and `CXX` variables before running `cmake`
 ```sh
 $ mkdir source/build
 $ cd source/build

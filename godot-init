@@ -1,0 +1,332 @@
+#! /bin/sh
+
+NAME=$(basename $PWD)
+LIBNAME=$(echo $NAME | sed 's/[^a-zA-Z0-9]//g' | tr '[:upper:]' '[:lower:]')
+
+BOLD=$(tput bold)
+GRN=$(tput setaf 2)
+RED=$(tput setaf 1)
+BLUE=$(tput setaf 4)
+ET=$(tput sgr0)
+
+GDHEAD=""
+GDRUN=""
+
+yn() {
+    while printf $BOLD"$1 [y/n] " && read a
+    do
+        case $a in
+            ([yY]) printf "$ET" && return 0;;
+            ([nN]) printf "$ET" && return 1;;
+            (*) printf $RED"$a is not valid\n"$ET;;
+        esac
+    done
+}
+
+gdproject() {
+if [ -d "$PWD/.git" ]; then
+    echo $RED$BOLD"ERROR:$BLUE .git$RED directory already exists.  Exiting..."$ET
+    return 1
+fi
+
+echo $BOLD'-- '$BLUE'Godot Project Init'$ET
+echo $BOLD$GRN"Creating Project $ET$BOLD'$NAME'"$ET
+echo
+
+echo
+printf "# $NAME\n" > README.md
+echo "created file: 'README.md'"
+
+mkdir -vp "out"
+printf "#Godot Ignore\n" > out/.gdignore
+
+##### BEGIN PROJECT #####
+# .gitignore
+
+echo "H4sICIToGmEAAy5naXRpZ25vcmUALY6xDoMwDET3fAUVG0O6VKh7q07tzIiAuNQi4Ch2qvD3NdDB
+z+eTbV1Z3DHCIBQR2FicA0U5V8bOtJD2PqF32int7pcHcnAopSmLB3qQNehxZTstJoVbF4+9ioPO
+eyVkUOqjbTMEZb7WbX05xG5OBvIWwA7v8S/bEIFBeLdur26CJ7KOksUmhrhlaD4o4NU2Jzs6HBeK
+8AMRk0qi2QAAAA=="| base64 -d | gunzip > .gitignore
+echo "created file: .gitignore"
+# base/core/Init.gd
+mkdir -vp base/core
+echo "H4sICAZybWEAA0luaXQuZ2QAjdDLCsIwEAXQtfmKId2kUK26LCi4EVy0Gz8ghGSqhTrRJC31742v
+hQ/Q7eXcOzA4BCTjobIGGUssOVTmDL1yIAmHAAs4OmytMoI79EWe85SxuiMN8kZFWrBRstVIWCpS
+O3QTvVe0Q+mvmbitpO+kVgZlQ4Kvqk3JM5hPphlMvzPbhVc3+3DaEqGO7LEbpce2zoBLS+uY8R+V
+eOOPzqlrgojpUXn/fMLdCuoOUEBDIYXxEnrbmOLhLozvmx9iAQAA"| base64 -d | gunzip > base/core/Init.gd
+echo "created file: base/core/Init.gd"
+# base/core/Init.tscn
+mkdir -vp base/core
+echo "H4sICPNybWEAA0luaXQudHNjbgAtjbEKwjAQQPd+xXGTLgYVOggZHVw66FikxOTaBmwSkivUv/da
+uhzHPd67dnBdsRQIvtHIypSKvkAf82RYX2H2TqOMm1J9qWs79M6PY8Z3VbW0cJepxDlbAv4l0viy
+2SdGSIZHjQLF+5hCysZM6hE8nwaHsEbPWyNERxDMJO5Kce80chZethxouC/83D8dQFQ4Vn9+iujA
+ugAAAA=="| base64 -d | gunzip > base/core/Init.tscn
+echo "created file: base/core/Init.tscn"
+# base/core/SceneManager.tscn
+mkdir -vp base/core
+echo "H4sICN2NCWEAA1NjZW5lTWFuYWdlci50c2NuAItOT4kvTk7NS1VIyy/KTSyxNYrl4orOy09JVchL
+zE21VXIPBsn6JuYlpqcWKSmUVBZgCMZy5SRWphYp2CqYcgEAZEu7LVAAAAA="| base64 -d | gunzip > base/core/SceneManager.tscn
+echo "created file: base/core/SceneManager.tscn"
+# base/core/Settings.gd
+mkdir -vp base/core
+echo "H4sICAZybWEAA1NldHRpbmdzLmdkAG2STWsCMRCGz5tfMWwvCh5WoVgED2K3H/QiWCg9LTGZuMG4
+WfKhleJ/bzZuKtIe32fmDXlnBr8cNtzC8xqdk83WEnKgBqodnva0tTCHb5LlHAX1yuWzTmW50OZI
+DQ/yrfysPkYd21C268E6AoXC9WARgZHbOpHHSHybHKvFsoyI62OT4Mvr03uETCslrdSpcmlFy2iL
+Ca2Xi1VJsjM5E3IHKQ2EMJJuFILTUGvFgSoFWoCrEZhuhNx6E+s25Y/xk4LZ/BKZS9sqeuonkOVH
+yV0d1HjyUIwiqbHPN50UAZzjH6nnUv+a9t5KFpQzHi8mFAKZszfsoCXDGxJ91UErv+8K0/sb899C
+fOGKx0X8UDcZ4RsGlUHKT4PhjGQsjKMK20VjkA/yEDvsZHTNP/y/pTsP2/X1ZzIkP83SIY9IAgAA"| base64 -d | gunzip > base/core/Settings.gd
+echo "created file: base/core/Settings.gd"
+# base/core/Settings.tscn
+mkdir -vp base/core
+echo "H4sICLlybWEAA1NldHRpbmdzLnRzY24ARU29CsIwEN7zFEcmXQztKNwo7nYspcTkjAGbhNwJ9e2N
+YnH7/r8x+JkdJYJHtg0KFcYebrkuVrCflBpplbkS52d1BMXKHXWjR2Oulsm4XMkMJBJT4EPwGuRV
+CPXgaiyiIXrsPispe4Jkl2adt/iW/QuT4m8PEE6rXH6vO+hgr979tIwWqwAAAA=="| base64 -d | gunzip > base/core/Settings.tscn
+echo "created file: base/core/Settings.tscn"
+# base/core/splash_disable.png
+mkdir -vp base/core
+echo "H4sICH/Lh14AA3NwbGFzaF9kaXNhYmxlLnBuZwABIQLe/YlQTkcNChoKAAAADUlIRFIAAAACAAAA
+AggCAAAA/dSacwAAAYRpQ0NQSUNDIHByb2ZpbGUAACiRfZE9SMNAHMVfP6QiFQcLijhkqE4WShVx
+1CoUoUKoFVp1MLn0C5o0JCkujoJrwcGPxaqDi7OuDq6CIPgB4uTopOgiJf4vKbSI8eC4H+/uPe7e
+Af5mlalmMA6ommVkUkkhl18VQq8IIoAhxJGQmKnPiWIanuPrHj6+3sV4lve5P0e/UjAZ4BOIZ5lu
+WMQbxNObls55nzjCypJCfE48YdAFiR+5Lrv8xrnksJ9nRoxsZp44QiyUuljuYlY2VOIp4qiiapTv
+z7mscN7irFbrrH1P/sJwQVtZ5jrNUaSwiCWIECCjjgqqsBCjVSPFRIb2kx7+EccvkksmVwWMHAuo
+QYXk+MH/4He3ZnEy4SaFk0DPi21/jAGhXaDVsO3vY9tunQCBZ+BK6/hrTWDmk/RGR4seAQPbwMV1
+R5P3gMsdYPhJlwzJkQI0/cUi8H5G35QHBm+BvjW3t/Y+Th+ALHWVvgEODoHxEmWve7y7t7u3f8+0
++/sBqY1yveQ5SMAAAAAJcEhZcwAALiMAAC4jAXilP3YAAAAHdElNRQfkBAMXMRP9vgmDAAAAGXRF
+WHRDb21tZW50AENyZWF0ZWQgd2l0aCBHSU1QV4EOFwAAAAtJREFUCNdjYEAGAAAOAAEx6d0VAAAA
+AElFTkSuQmCCSQ/OlSECAAA="| base64 -d | gunzip > base/core/splash_disable.png
+echo "created file: base/core/splash_disable.png"
+# default_env.tres
+
+echo "H4sICJiAFmEAA2RlZmF1bHRfZW52LnRyZXMAXcuxCsIwEIDhPU9xZNKx2TO6ix1LKUnuLCVNrlwS
+IW+vgoK4/nz/tOIiVLhJIKj9IKsv+bEJ50S5atjZ4VIqHcUauLMkV62ZlZpK8//jVTgQNnH7GLuG
+De3wll81K+9CXIVbxiUxElgwv63E/kpj87fPcYIBzuoJaHZXQ6MAAAA="| base64 -d | gunzip > default_env.tres
+echo "created file: default_env.tres"
+# icon.png
+
+echo "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
+AA=="| base64 -d | gunzip > icon.png
+echo "created file: icon.png"
+# lib/libbase.gdnlib
+mkdir -vp lib
+echo "H4sICAyJCWEAA2xpYmJhc2UuZ2RubGliAIWR3YrCMBCF7/MU0ntb/KGK0It9il0opUzMWALjRJKq
+9e03af1piujdzJnvDJOTskFGC1QJp7khbA0XByCHggyo2vAei9aeUbjbURqqTxYPuiuSxijT1omw
+GDiQdMdK5NbeKvHDyhqtUrBHBKnnlw0UiUW3yzLSMoNhHGoJDsdY6kwytufr+WX7zTxAkbXb5p9M
+fjzF63z9xeGJ3vSrWZmrS2PDdVCfBg8rohe9Wn6iV8uB/lssJntJ87kbbw0nBCxeGGN+XcBKhSdk
+hbzX6N5/SzmbVW8Cj+QQ5lQIcfXaKI2o9+f1/f1Fz/qh/wNfXk9VfAIAAA=="| base64 -d | gunzip | sed "s/libbase/lib$LIBNAME/g" > lib/lib$LIBNAME.gdnlib
+echo "created file: lib/lib$LIBNAME.gdnlib"
+# project.godot
+
+echo "H4sICCdzbWEAA3Byb2plY3QuZ29kb3QAdVJda9swFH3XrxB52QclasNgpUUP3cggsMIg3VMIQpZv
+bIEsGekqoR3777uyY0iKB7aRdO4959xjPfK1b6wHboI/2CZHjTZ4frAOluyRb/BD4hUk5FBbhJrn
+ZH3DsYXhIET+e8O1r7kPyGsbwaB7vaFGKjMw1PU66g4QYqKtRt4E3kIEruktXdo5HqqjDTmRIrX+
+CLHT+EArzneJGMnQnhPluCQCKJ7wBOD5bj/UDSLyqF0GqtQp2cbzYUuq4cIDY+Og6kgbYpNfGFON
+C5V2Kploe1TGUT8kSdRziLLEkOQf9pexne57Z82Q2X6iFp605OLb03b9sn7+9fPpZb1gMXvRaeuJ
+CjyhEdKDEJVOIEyIIDbe4hKT8YuJJSdQJicMnaJlVJSuxJhhwt9hak61CgFV6sl2K2ynmxnhESWG
+pCv6571vrtsO2blk30AetEtwBRWHdFEo1hmwapQJLkT5vXw/3t7w8bn7NA1Qcpz8lPWoTZlmpBZd
+U6BbQKT7luTi83vfE3QObVtifdaeZoxz1RfwuYPtaGby+ko6J+vrcBJlTnGyNbbybnV/e3Xcgm1a
+lF9X18ckZN9KcucIJgwjoGlFF2rKfFUXuQi+hkieSRD80cbgO/Aoajjo7MrtAh3/G9pcx8XZFOQF
+tCQPacH+AbFMqGbiAwAA"| base64 -d | gunzip | sed "s/BASETEMPLATE/$NAME/g" > project.godot
+echo "created file: project.godot"
+##### END PROJECT #####
+
+echo
+echo $BOLD"--$GRN Initializing Git"$ET
+git init
+
+echo
+yn "Add$BLUE GDNative$(tput setaf 7) support?"
+if [ $? -eq 0 ]; then
+    gdnative
+fi
+
+echo
+echo $BOLD"--$GRN Commiting current project"$ET
+git add .
+git commit -m "hello $NAME"
+
+echo
+echo $BOLD"$BLUE$NAME$GRN setup is complete!"$ET
+echo $BOLD"Set the Workspace Folder to \"$NAME\" in your IDE to edit source."
+echo "To begin working in Godot, import the \"$NAME\" directory. :)$ET"
+}
+
+gdnative() {
+if [ ! -d "$PWD/.git" ] || [ ! -f "$PWD/project.godot" ]; then
+    echo $RED$BOLD"ERROR:$BLUE $NAME$RED does not appear to be a Godot project.  Exiting..."$ET
+    return 1
+fi
+echo $BOLD'-- '$BLUE'GDNative'$ET
+
+mkdir -vp "lib" "gdns" "source" "source/include" "source/src"
+printf "#Godot Ignore\n" > source/.gdignore
+echo
+echo $BOLD"-- $GRN Adding the$BLUE godot-cpp$GRN submodule"$ET
+git submodule add https://github.com/GodotNativeTools/godot-cpp.git source/include/godot-cpp
+
+echo
+yn "Add$BLUE gdregistry$(tput setaf 7) as a submodule?"
+if [ $? -eq 0 ]; then
+    echo $BOLD"--$GRN Adding the$BLUE gdregistry$GRN submodule"$ET
+    git submodule add https://github.com/hlfstr/gdregistry.git source/include/gdregistry
+    GDHEAD="#include <gdregistry/gdregistry.hpp>"
+    GDRUN="godot::GDRegistry::Run();"
+fi
+
+echo
+echo $BOLD"--$GRN Init git submodules"$ET
+git submodule update --init --recursive
+##### BEGIN GDNATIVE #####
+# source/CMakeLists.txt
+mkdir -vp source
+echo "H4sICBCJCWEAA0NNYWtlTGlzdHMudHh0ALVY6W+jRhT/3Ej5H568K9WJ1qG76aWV+gHD2KHL4QLO
+0S8IwzimS4zFsdk04n/vG2YYcGIn2aOJlHC8+/i9N2iW+oEElmEb1twKXPLX3HCJPjwnrmc4Npye
+vP3l6PDgFXi0hHV4QyFbwibP/qFRCWUGUZXndF1CnOT4JMvvGqLDgynxg4lhElu1SKA51syxie0P
+Z5zTiOH1vdZo1uaui28Cz5m7Ggl0w60B/xDNd9yroxcJktc1MCpk8nzXsKdDl8xMVSMwYL/BAHYz
+If3Mdf5EjcMtWaZqT+fqlHigXV4iEfv1iN+GxmO2MkGcNxgbtupeNQ4on2heJNm6aLheQU4LjF64
+jiFZR2kVUyhXFATRSfm5PDxgLqK9lnNOMAkYFI+g7L4qZqdha+ZcJ8NOay9sSk8gODMfGVVTWKDT
+ZVilTcYGOl1U14M3UBUURjrPwnhumHrgX83IHy5NaYivllmOhvPrRZWkMaqfDG3Hh4csqAPwh8Xm
+4StolCEBsXXkPuIRFJm/vAw8X7V11dXh7W/C0vMwT8JFSgtmXwxpWNIcwwaLPFxHK1oICcHEVKce
+CIFmd8tkTDHa46QsWK06HicZG74Hp++OGi+4AZ7xN3Emwblj6MEMsPJVE35vnJEMv/7ct72VXdwV
+Jb0RlS5qzXdM54K4sq69K88nVsAKsobezZE0kMUUyrvNfhldHGvYCnfbkFlVbqpe83FXnbk/U/0z
+GOwuk5MTJU0Wyuv7vomDrdS4c9s3sN+YpLkfyH5kIoX0F3IEOhnPp1/B5xKTqNgEezlNY+yyhnu5
+jfs4nrNxL9+zNs708U77RHo7xBjwpGorGn2EKLvZJCnN3zSQwaBjmYbXBYQbBN4NtkdJ07umjqUo
+1ksMHBFF3MDQ6wFYqq+dIXYNLO9cG8iqbhuHcfLLGhT9wrBP3+H/oH+hOxceKBenoExd9khzsY4Y
+NJHAdoIL1bWxZpFCtx0cH5Z6CQo5K6JOl9npMqWuCyRDGEOoQxhXzfe2wxn63vTqvnNE4FIfbHb5
+8hMz3+YZVSydCyemR4bPcVp6zNxsWAVb2/gd/z7u0XJmaDC6uM2Tko6KMk/W18V39WzknCJc233z
+XuDV6BqZdvvUR7VJgpUWpikUWZVHCP4JQ2CEXXGPCCNm1NR0xnJCcVjxYDfQFHmkHJ9Ex8cM8x4z
+nxFVx/n2JPOqYRYTLFlTQOTKQwZ0qq63jdkbhwJuz1TcYVCwsK/uQWYZ5teso2hYVjkbJ77qsh1D
+dE8wIaqPJe49Ejqbj01McfT5c1CUcdAMLIx6IPiReEZc39jFKV/hJZkYlzBANwZ8FOH8c3EA4c0P
+XyxNQAt73gf7hu7k9b0QHahjowGYrSr+rprYrOQq+kXFwi2wjCMYD5gQezXkFsBDtepshmICPhNb
+I65AJqip8a7Ej75JqmnYH6RIsxPJ7DfEsnadxVk5ijabwwOLeB6uhEPcW/w5dpogeY8LpqQ64sXp
+zccS8/csbGIbVCTrnnWyLxrDimwUbikUq6zCFWIVfmLbWoUdLAnfbG2a7b6+zm65bTphwSC2tivt
+29raIGDF9uIgiqeJHu/C5yT1ZeliX0GIuQlZgNNsEaZ8cLYSxKrrsXJ9YfTaJ1/BokRozdfwXdM1
+Z9ta1Q8PtlGrPSUtszTGdZav1kuKzyLK3fYanMXA7LaAi3sFVhjlGdviCxrm0QqKatEufwlGk+0L
+OUVgW2O+CjxWWKrmOkNeih47h7BDAFqDTA0QSFSGaIXrKBoEuNSovnHOjh+csO6ulGM5BPGWqYAB
+HysTxyWqdjZsxDAGIa4W8wlRwfB6S1AnUtC2hIAt6flD3q7QanlAJGGmuWx1S9te33NPmeVCQs3B
+icdDJIdvWyKTRZMVHs+CRVgWk4jesH33ZImg6NYcTo/kgrFut4H2CQ4q3+XHjoGsrIFwUXNwMbbn
+RHrZOswcXCRrHILxVrX0AUNqkBzLKk2lQU+V+DYrKiWXmA+Gjp2IWtGs8CM1Ma4FO20Kk58Ax22p
+ADsAsiceyaWH9aOtpZfuLothHGdrmb4mlWW1XO79fqAyet5uL/sOwYLYY2ova6XRzE76j+tEEj1b
+Fd8hqZ1FklDh29u3Z9LK4ir9vxP5aNw2cJbhAMthTWlM4zanYvqIESFRZccIYir54rYN7u10qZ/F
+/P0EuKFKnN+yPVhRnGp58aWG8vN4u2i+dBI9UCkMsrNbHP1hCfQTze/KFR5HICnYYbLC5SCl5Y/Y
+JZiaNPlXfolCmnZiRMiJOx8YdjcmMFlspzbsugEnbBaveynwujkI180JRJC0a2EPebuhc873/63Z
+2X7GGuH232wObZngc0HLSwltHO7hZZxIi3f1o1L7D3HdQgzxFAAA"| base64 -d | gunzip > source/CMakeLists.txt
+echo "created file: source/CMakeLists.txt"
+# source/CMakeSettings.json
+mkdir -vp source
+echo "H4sICHZ9G2EAA0NNYWtlU2V0dGluZ3MuanNvbgDtUM1OwkAQvpPwDpMNR2APEDQkxhjx6gG9WWK2
+ZVoGujtkd4uapk/mwUfyFewWo1ANF68eNrOZ7zfz/vpWdjsAUsIdIqy837qplBkPNSWWHad+mLCW
+Mn3KyWykvAyDlhfno/HZZAQpW9BsEcjUX608sQEVc+HBr8hBSjkOQ4BI2KSUFbahODGFh7AGKPej
+Zhilsd6L58l4MMO4yET/C8vQYC1lGwi3ZNbqADyyvn/ZNi5tBzIrtORvzI4sG43GNyVAaLdLHuvM
+8AQsvhVxQflyzuyDXa/cWl5j4mdkqyhqsCjqlaF0dRTjvMrz07JP0m/6RKsNXrPWyiyvbBY6CtHq
+1IIHu0O9R+fb+j1a9U9dfI45Kod/uvlPj/+rV2Esup3qA+E5CWRrAwAA"| base64 -d | gunzip > source/CMakeSettings.json
+echo "created file: source/CMakeSettings.json"
+# source/src/base.cpp
+mkdir -vp source/src
+echo "H4sICCJXI2EAA2Jhc2UuY3BwAK2SQWvCQBCFz13Y/zDYS/Wgd1sEMWH1Ekuw0FvQ7KgDOrvEUSql
+/72bxFbSehBxLwsz7735GOaRON/sLcKLcdZJd+39QKtez0RpbMbxMIpTrcoCJHOhA8KESWC551zI
+MVhcEqOFxREqv1b4IVgwtEYtODiyYKIki99fp+kMVqUiW1mukjIKSU8XapnzZfYOOq4Nn1o9VJp+
+39Rf0+/az1p9NRFnWGwpiPA+nPIT9xf2t3Et8TmpgR1G1+DIUhzBO2K5hbiesssL8lJvp9J11nO2
+G7xE9t9x0gY6CO90B+lbEmi/AdEe6fgrAgAA"| base64 -d | gunzip | sed "s|//GDREGHEADER|$GDHEAD|g;s|//GDREGRUN|$GDRUN|g" > source/src/$LIBNAME.cpp
+echo "created file: source/src/$LIBNAME.cpp"
+# source/version.hpp.in
+mkdir -vp source
+echo "H4sICAyJCWEAA3ZlcnNpb24uaHBwLmluAFPOTMtLSU1TiHcIcw2K93P0dXWI9/Rz8+dSzkwDi7u4
+OoW6cykD2Zl5qRjKFDSUHAKC/L1cnUMgogplDvFAJcGe/n7xvo5e/kEOekgCnn6oAkGuYZ4ghoMu
+QizE0d1BSZNLOTWnOJXm9oItykvJTINTWMIDqouIIIGqBLmO1qFAoVUYHgcAGyYP0QkCAAA="| base64 -d | gunzip > source/version.hpp.in
+echo "created file: source/version.hpp.in"
+# source/version.txt
+mkdir -vp source
+echo "H4sICAyJCWEAA3ZlcnNpb24udHh0AG2S3U6DMBTH7/sUJ+AFS2T6Al4g6ya6UVJgxsSkYduJIxmF
+tN00Mb67h2VTNOvV6fn8nX/rQ44ODmhs3WrQ+2aFhllyBWrJZZ6IVC2iRyHhdvTfnaSX3JIvk97o
+I8z370KYtKBbB7ipHaxw176D29YWdrVGCO98n1lnav0GQSHKLOMSrj4zKR55XKg0WvAvoNZHa8Ty
+QibpLJA8m0cxBy/0wPN+4lR4Nr9GDD9wvXeoOtOu0dogFotFlE7gjTAMHsKuMpYAQrttjYMHHk2Y
+5Hk5L9Qykkl0P+egDFq12TcdE2WRlcPIed0imrFnIZ8IS00SSdBCvgw2yEUpY96HCMkH2zbo6gYt
+aYAGgXSoQOP7UYwNdqg3vRT0FA5NU+tqd02wTXtAKqjcSapfAV71UYEhDg0fXmksi0U6TWal5Gqa
+EHzAgI53EfLm9BXG264b19o7p5465n+SwoHgfYHHRuwbdl3PmVECAAA="| base64 -d | gunzip > source/version.txt
+echo "created file: source/version.txt"
+##### END GDNATIVE #####
+}
+
+if [ $# -eq 0 ]; then
+    gdproject
+else
+case $1 in
+    "-c") # Setup GDNative in the current directory.
+        gdnative
+        ;;
+    "-h") # Display this help.
+        cat <<EBF
+USAGE: $0 [OPTION]
+$(grep "....)\ #" $0 | sed 's/)//g;s/"//g;s/#/\t\t/g')
+
+Creates a new Godot project in the current directory if no flag passed
+EBF
+        exit 0
+        ;;
+    *)
+      printf "%s: invalid option -- '%s'\nTry '%s -h' for more information.\n" "$0" "$1" "$0"
+      exit 1
+      ;;
+esac
+fi

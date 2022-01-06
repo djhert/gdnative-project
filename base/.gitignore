@@ -1,0 +1,26 @@
+# Directories
+.import/*
+.mono/*
+build/*
+out/*
+.vscode/*
+.vs/*
+
+# Filetypes
+*.a
+*.so
+*.dynlib
+*.lib
+*.dll
+*.exe
+*.out
+*.app
+*.x86_64
+*.x86
+*.apk
+export.cfg
+export_presets.cfg
+CMakeLists.txt.user
+
+# Whitelist
+!.gdignore

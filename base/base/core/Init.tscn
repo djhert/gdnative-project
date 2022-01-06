@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://fs66cgfdihhr"]
+
+[ext_resource type="Script" path="res://base/core/Init.gd" id="1"]
+
+[node name="Init" type="Node"]
+script = ExtResource( "1" )

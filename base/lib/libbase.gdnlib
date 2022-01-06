@@ -1,0 +1,23 @@
+[general]
+singleton=false
+load_once=true
+symbol_prefix="godot_"
+reloadable=true
+[entry]
+Android.armeabi-v7a="res://lib/android/libbase.armeabi-v7a.so"
+Android.arm64-v8a="res://lib/android/libbase.arm64-v8a.so"
+Android.x86="res://lib/android/libbase.x86.so"
+Android.x86_64="res://lib/android/libbase.x86_64.so"
+Windows.64="res://lib/windows/libbase.64.dll"
+Windows.32="res://lib/windows/libbase.32.dll"
+X11.64="res://lib/linux/libbase.64.so"
+X11.32="res://lib/linux/libbase.32.so"
+[dependencies]
+Android.armeabi-v7a=[  ]
+Android.arm64-v8a=[  ]
+Android.x86=[  ]
+Android.x86_64=[  ]
+Windows.64=[  ]
+Windows.32=[  ]
+X11.64=[  ]
+X11.32=[  ]
